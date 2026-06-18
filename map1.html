@@ -1,0 +1,389 @@
+Here is your complete, updated `index.html` file.
+
+I took the text you provided and formatted it nicely into paragraphs within the "About" section. I also made a few small enhancements:
+
+* I made the UN goal quote **bold** so it stands out.
+* I turned the UN URL into a clickable link that opens in a new tab.
+* I added a tiny bit of CSS at the top so that the link matches your forest color theme!
+
+Here is the updated code to copy and paste over your existing `index.html`:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forest Coverage 2025</title>
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --forest-dark: #1a2e1a;
+      --forest-mid: #2d5a27;
+      --forest-light: #4a8c3f;
+      --canopy: #7db87a;
+      --mist: #f0f4f0;
+      --text-main: #1a2e1a;
+      --text-soft: #5a6e5a;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--mist);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--forest-dark);
+      padding: 2.5rem 3rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--forest-light), var(--canopy), var(--forest-light));
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--mist);
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      color: var(--canopy);
+      font-size: 0.95rem;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+    }
+
+    nav {
+      background-color: var(--forest-dark);
+      padding: 0 3rem;
+      display: flex;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      color: var(--canopy);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 1rem 1.5rem;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s;
+    }
+
+    nav button::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--canopy);
+      transform: scaleX(0);
+      transition: transform 0.2s;
+    }
+
+    nav button:hover { color: var(--mist); }
+    nav button.active { color: var(--mist); }
+    nav button.active::after { transform: scaleX(1); }
+
+    main {
+      padding: 2.5rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .tab-content { display: none; animation: fadeIn 0.3s ease; }
+    .tab-content.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .map-container {
+      border: 2px solid var(--canopy);
+      border-radius: 4px;
+      overflow: hidden;
+      background: white;
+      height: 680px; 
+    }
+
+    /* Leaflet Specific Box Styles */
+    #leaflet-map { 
+      width: 100%; 
+      height: 100%; 
+      z-index: 1; 
+    }
+    
+    .info { 
+      padding: 10px 14px; 
+      font: 14px/16px 'Inter', sans-serif; 
+      background: white; 
+      background: rgba(255,255,255,0.95); 
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15); 
+      border-radius: 4px; 
+      color: var(--text-main);
+      border: 1px solid var(--canopy);
+    } 
+    .info h4 { margin: 0 0 5px; color: var(--forest-mid); font-weight: 600; }
+    
+    .legend { text-align: left; line-height: 20px; color: var(--text-soft); } 
+    .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.85; border-radius: 2px;}
+
+    .map-note {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      font-style: italic;
+    }
+
+    .about-content, .data-content { max-width: 720px; }
+
+    .about-content h2, .data-content h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: var(--forest-mid);
+      margin-bottom: 1rem;
+    }
+
+    .about-content p, .data-content p {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--text-soft);
+      margin-bottom: 1.2rem;
+    }
+
+    .about-content a {
+      color: var(--forest-light);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .about-content a:hover {
+      color: var(--forest-mid);
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-soft);
+      font-size: 0.8rem;
+      border-top: 1px solid #dde8dd;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Forest Coverage 2025</h1>
+    <p>Global forested area as a percentage of total land surface</p>
+  </header>
+
+  <nav>
+    <button class="active" onclick="showTab('map', this)">Map</button>
+    <button onclick="showTab('about', this)">About</button>
+    <button onclick="showTab('data', this)">Data</button>
+  </nav>
+
+  <main>
+
+    <div id="map" class="tab-content active">
+      <div class="map-container">
+        <div id="leaflet-map"></div>
+      </div>
+      <p class="map-note">Interactive map generated with Leaflet. Data source: UN SDG DataHub.</p>
+    </div>
+
+    <div id="about" class="tab-content">
+      <div class="about-content">
+        <h2>About this project</h2>
+        <p>
+          The data presented measures the status in 2025 of the land area of forest in a country as a percentage of total land area in a country. This directly connects to the UN’s sustainable goal 15, life on land, which has the goal to <strong>“Protect, restore and promote sustainable use of terrestrial ecosystems, sustainably manage forests, combat desertification, and halt and reverse land degradation and halt biodiversity loss.”</strong> By having baseline forest data and comparing trends over time, the UN is able to directly track the impacts of deforestation and land degradation. More information about the sustainable development goals and the data associated can be found at <a href="https://unstats.un.org/sdgs/metadata/?text=mar" target="_blank">the UN Statistics Division website</a>.
+        </p>
+        <p>
+          This map is a <strong>choropleth map</strong>. A choropleth map is a type of informational map that relays a certain data set pertaining to countries in a clear, colorful format. Using different colors belonging to ranges of forest coverage, (0-20%, 20-40%) countries are classified in a range and set to a certain shade of a color. The benefit of this is that the map is extremely easy to understand, and makes for a good story, as countries’ differences are often inflated. The downside to this simplicity is, however, that regional differences are not visible. In the case of forests specifically, forests transcend borders, and this can simply not be seen on country based data.
+        </p>
+        <p>
+          While making this map I learned how to fuse a map file and a data file together, allowing me to create color shades and project the data onto a map. I also learned how to deal with data types, folders, and other computer tricks. Most of all, I learned how to troubleshoot errors, and that sometimes the only way is AI.
+        </p>
+      </div>
+    </div>
+
+    <div id="data" class="tab-content">
+      <div class="data-content">
+        <h2>Data</h2>
+        <p>
+         <embed src="forestedpercentagepdf.pdf" type="application/pdf" width="100%" height="600px">
+        </p>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    Forest Coverage 2025
+  </footer>
+
+  <script type="text/javascript" src="data_in_geojson.js"></script>
+
+  <script>
+    // Tab switching logic
+    function showTab(id, btn) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      btn.classList.add('active');
+      
+      if(id === 'map') {
+        setTimeout(() => {
+          mapInstance.invalidateSize();
+        }, 10);
+      }
+    }
+
+    // Leaflet Map Initialization
+    const mapInstance = L.map('leaflet-map').setView([20, 0], 2);
+
+    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(mapInstance);
+
+    // Control that shows info box on hover
+    const info = L.control();
+
+    info.onAdd = function (map) {
+      this._div = L.DomUtil.create('div', 'info');
+      this.update();
+      return this._div;
+    };
+
+    info.update = function (props) {
+      // Adjusted properties to accurately match your exact keys in data_in_geojson.js
+      const contents = props ? `<b>${props.SOVEREIGNT}</b><br />${props["Record format_Field9"]}% of total land that is forest` : 'Hover over a country';
+      this._div.innerHTML = `<h4>15.1.1 Forest area</h4>${contents}`;
+    };
+
+    info.addTo(mapInstance);
+
+    // Color system matching your bins
+    function getColor(d) {
+      return d > 80  ? '#006837' : 
+             d > 60  ? '#31a354' : 
+             d > 40  ? '#78c679' : 
+             d > 20  ? '#c2e699' : 
+             d >= 0  ? '#ffffcc' : 
+                       '#cccccc';  // Handles missing or undefined values
+    }
+
+    function style(feature) {
+      // Coerce the string percentage from geojson to a floating number safely
+      const val = parseFloat(feature.properties["Record format_Field9"]);
+      return {
+        weight: 1,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+        fillOpacity: 0.8,
+        fillColor: getColor(val)
+      };
+    }
+
+    function highlightFeature(e) {
+      const layer = e.target;
+
+      layer.setStyle({
+        weight: 3,
+        color: '#666',
+        dashArray: '',
+        fillOpacity: 0.9
+      });
+
+      layer.bringToFront();
+      info.update(layer.feature.properties);
+    }
+
+    let geojson;
+    // Map loads 'nationData' variable generated inside data_in_geojson.js
+    if (typeof nationData !== 'undefined') {
+        geojson = L.geoJson(nationData, {
+            style: style,
+            onEachFeature: onEachFeature
+        }).addTo(mapInstance);
+    } else {
+        console.error("Error: nationData variable is missing. Check your data_in_geojson.js file mapping.");
+    }
+
+    function resetHighlight(e) {
+      if (geojson) geojson.resetStyle(e.target);
+      info.update();
+    }
+
+    function zoomToFeature(e) {
+      mapInstance.fitBounds(e.target.getBounds());
+    }
+
+    function onEachFeature(feature, layer) {
+      layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight,
+        click: zoomToFeature
+      });
+    }
+
+    mapInstance.attributionControl.addAttribution('SDG data &copy; <a href="https://unstats-undesa.opendata.arcgis.com/">UN SDG DataHub</a>');
+
+    // Generate Map Legend
+    const legend = L.control({position: 'bottomleft'});
+
+    legend.onAdd = function (map) {
+      const div = L.DomUtil.create('div', 'info legend');
+      const grades = [0, 20, 40, 60, 80];
+      const labels = [];
+      let from, to;
+
+      labels.push('<strong>% Forested Area</strong><br>');
+
+      for (let i = 0; i < grades.length; i++) {
+        from = grades[i];
+        to = grades[i + 1] ? grades[i + 1] : 100;
+        labels.push(`<i style="background:${getColor(from + 1)}"></i> ${from}% &ndash; ${to}%`);
+      }
+      
+      labels.push(`<i style="background:#cccccc"></i> No Data`);
+      div.innerHTML = labels.join('<br>');
+      return div;
+    };
+
+    legend.addTo(mapInstance);
+
+  </script>
+</body>
+</html>
+
+```
